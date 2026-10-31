@@ -4,7 +4,7 @@
  */
 
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:8080/api',
+    BASE_URL: 'https://lab-management-system-aj3p.onrender.com/api',
     TOKEN_KEY: 'crs_jwt_token',
     USER_KEY: 'crs_user_data'
 };
