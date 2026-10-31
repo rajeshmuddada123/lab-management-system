@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal — College Resource Sharing</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="app-layout">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div>
+                    <h2>College Resources</h2>
+                    <span>Student Portal</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Main Menu</div>
+                <a class="nav-item active" onclick="switchSection('dashboardSection')">
+                    <i class="fa-solid fa-gauge nav-icon"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a class="nav-item" onclick="switchSection('browseSection')">
+                    <i class="fa-solid fa-microscope nav-icon"></i>
+                    <span>Browse Equipment</span>
+                </a>
+                <a class="nav-item" onclick="switchSection('labsSection')">
+                    <i class="fa-solid fa-building nav-icon"></i>
+                    <span>Laboratories</span>
+                </a>
+                <a class="nav-item" onclick="switchSection('bookingsSection')">
+                    <i class="fa-solid fa-calendar-check nav-icon"></i>
+                    <span>My Bookings</span>
+                    <span id="activeBookingsBadge" class="nav-badge" style="display:none;">0</span>
+                </a>
+                <a class="nav-item" onclick="switchSection('waitlistSection')">
+                    <i class="fa-solid fa-hourglass-half nav-icon"></i>
+                    <span>Waiting List</span>
+                </a>
+                <a class="nav-item" onclick="switchSection('notificationsSection')">
+                    <i class="fa-solid fa-bell nav-icon"></i>
+                    <span>Notifications</span>
+                    <span id="unreadNotifBadge" class="nav-badge" style="display:none;">0</span>
+                </a>
+                <a class="nav-item" onclick="switchSection('profileSection')">
+                    <i class="fa-solid fa-user-graduate nav-icon"></i>
+                    <span>My Profile</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-summary">
+                    <div class="user-avatar-circle" id="sidebarAvatar">ST</div>
+                    <div class="user-profile-details">
+                        <div class="user-name" id="sidebarUserName">Student</div>
+                        <div class="user-role-label" id="sidebarUserReg">Roll No</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="app-main">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="page-title-heading" id="pageTitle">Student Dashboard</h1>
+                </div>
+
+                <div class="navbar-right">
+                    <button class="nav-action-icon-btn" onclick="switchSection('notificationsSection')" title="Notifications">
+                        <i class="fa-regular fa-bell"></i>
+                        <span id="topNotifDot" class="badge-dot" style="display:none;"></span>
+                    </button>
+                    <button class="btn-logout" onclick="Api.logout()">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="page-content">
+
+                <!-- Alert banner for overdue equipment -->
+                <div id="overdueAlertBanner" style="display:none; background:#fef2f2; border:1px solid #f87171; color:#991b1b; padding:1rem 1.25rem; border-radius:8px; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.75rem;">
+                    <i class="fa-solid fa-triangle-exclamation" style="font-size:1.5rem; color:#dc2626;"></i>
+                    <div style="flex:1;">
+                        <strong style="display:block; font-size:0.95rem;">Action Required: Overdue Equipment</strong>
+                        <span style="font-size:0.875rem;">You have one or more items that have exceeded their scheduled return date. Please return them to the respective lab immediately.</span>
+                    </div>
+                </div>
+
+                <!-- 1. DASHBOARD SECTION -->
+                <section id="dashboardSection">
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statActiveBookings">0</h3>
+                                <p>Active Reservations</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statApprovedBookings">0</h3>
+                                <p>Approved Bookings</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon amber">
+                                <i class="fa-solid fa-hourglass-half"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statWaitlistCount">0</h3>
+                                <p>Waiting List Entries</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon purple">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statCompletedBookings">0</h3>
+                                <p>Completed Returns</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Equipment Access & Recent Bookings -->
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Recent Booking Activity</h2>
+                            <button class="btn btn-secondary btn-sm" onclick="switchSection('bookingsSection')">View All</button>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Booking ID</th>
+                                            <th>Equipment</th>
+                                            <th>Date</th>
+                                            <th>Time Slot</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentBookingsTableBody">
+                                        <tr><td colspan="6" class="empty-state">Loading recent bookings...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. BROWSE EQUIPMENT SECTION -->
+                <section id="browseSection" style="display:none;">
+                    <div class="toolbar-bar">
+                        <div class="search-input-box">
+                            <i class="fa-solid fa-magnifying-glass search-icon-abs"></i>
+                            <input type="text" id="equipmentSearchInput" placeholder="Search by name, code, or model..." oninput="handleEquipmentSearch()">
+                        </div>
+
+                        <div class="filters-group">
+                            <select id="categoryFilter" class="select-filter" onchange="loadEquipmentList()">
+                                <option value="">All Categories</option>
+                            </select>
+
+                            <select id="availabilityFilter" class="select-filter" onchange="loadEquipmentList()">
+                                <option value="">All Statuses</option>
+                                <option value="true">Available Only</option>
+                            </select>
+
+                            <button class="btn btn-secondary" onclick="loadEquipmentList()">
+                                <i class="fa-solid fa-rotate-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Equipment Cards Grid -->
+                    <div class="equipment-grid" id="equipmentCardsContainer">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </section>
+
+                <!-- 3. LABORATORIES SECTION -->
+                <section id="labsSection" style="display:none;">
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Institutional Laboratories</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="equipment-grid" id="laboratoriesContainer">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. MY BOOKINGS SECTION -->
+                <section id="bookingsSection" style="display:none;">
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>My Reservation History</h2>
+                            <div class="filters-group">
+                                <select id="bookingStatusFilter" class="select-filter" onchange="loadStudentBookings()">
+                                    <option value="">All Statuses</option>
+                                    <option value="PENDING">Pending Approval</option>
+                                    <option value="APPROVED">Approved</option>
+                                    <option value="COLLECTED">Collected</option>
+                                    <option value="RETURNED">Returned</option>
+                                    <option value="CANCELLED">Cancelled</option>
+                                    <option value="OVERDUE">Overdue</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Equipment</th>
+                                            <th>Lab</th>
+                                            <th>Date</th>
+                                            <th>Slot</th>
+                                            <th>Qty</th>
+                                            <th>Status</th>
+                                            <th>Details / Reason</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="fullBookingsTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. WAITING LIST SECTION -->
+                <section id="waitlistSection" style="display:none;">
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>My Active Waiting Lists</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Waitlist ID</th>
+                                            <th>Equipment</th>
+                                            <th>Date</th>
+                                            <th>Time Slot</th>
+                                            <th>Queue Position</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="waitlistTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. NOTIFICATIONS SECTION -->
+                <section id="notificationsSection" style="display:none;">
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Notifications & Alerts</h2>
+                            <button class="btn btn-secondary btn-sm" onclick="markAllNotificationsRead()">Mark All as Read</button>
+                        </div>
+                        <div class="panel-body">
+                            <div id="notificationsList" style="display:flex; flex-direction:column; gap:0.75rem;">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. PROFILE SECTION -->
+                <section id="profileSection" style="display:none;">
+                    <div class="content-panel" style="max-width: 650px;">
+                        <div class="panel-header">
+                            <h2>Student Academic Profile</h2>
+                        </div>
+                        <div class="panel-body" id="profileContent">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Booking Request Modal -->
+    <div id="bookingModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalEquipmentName">Reserve Equipment</h3>
+                <button class="modal-close-btn" onclick="closeBookingModal()">&times;</button>
+            </div>
+            <form id="bookingForm" onsubmit="submitBookingRequest(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="bookingEquipmentId">
+                    
+                    <div class="form-group">
+                        <label>Equipment Code & Laboratory</label>
+                        <p id="bookingEquipmentDetails" style="font-size:0.875rem; color:var(--text-secondary); background:#f8fafc; padding:0.5rem 0.75rem; border-radius:6px;"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookingDate">Date of Usage *</label>
+                        <input type="date" id="bookingDate" class="form-control" required>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label for="bookingStartTime">Start Time *</label>
+                            <input type="time" id="bookingStartTime" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookingEndTime">End Time *</label>
+                            <input type="time" id="bookingEndTime" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookingQuantity">Quantity Required *</label>
+                        <input type="number" id="bookingQuantity" class="form-control" value="1" min="1" max="10" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookingPurpose">Academic Purpose / Project Details *</label>
+                        <textarea id="bookingPurpose" class="form-control" rows="3" placeholder="Specify course practical, assignment, or project work..." required></textarea>
+                    </div>
+
+                    <div style="font-size:0.8rem; color:#64748b; background:#f1f5f9; padding:0.6rem 0.85rem; border-radius:6px;">
+                        <i class="fa-solid fa-circle-info"></i> Notice: If this time slot is in conflict or unavailable, you will automatically be queued on the <strong>Waiting List</strong>.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeBookingModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="bookingSubmitBtn">Confirm Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Equipment Details Modal -->
+    <div id="equipmentDetailModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 680px;">
+            <div class="modal-header">
+                <h3 id="detailEquipName">Equipment Specifications</h3>
+                <button class="modal-close-btn" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="detailModalBody">
+                <!-- Loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeDetailModal()">Close</button>
+                <button type="button" class="btn btn-primary" id="detailBookBtn">Proceed to Book</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/student.js"></script>
+</body>
+</html>

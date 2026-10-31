@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institutional Administration — College Resource Sharing</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="app-layout">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo" style="background:#0284c7;">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h2>Institutional Admin</h2>
+                    <span>System Oversight</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Operations</div>
+                <a class="nav-item active" onclick="switchAdminSection('dashboardSection')">
+                    <i class="fa-solid fa-chart-pie nav-icon"></i>
+                    <span>Dashboard Metrics</span>
+                </a>
+                <a class="nav-item" onclick="switchAdminSection('studentsSection')">
+                    <i class="fa-solid fa-user-graduate nav-icon"></i>
+                    <span>Student Accounts</span>
+                </a>
+                <a class="nav-item" onclick="switchAdminSection('facultySection')">
+                    <i class="fa-solid fa-chalkboard-user nav-icon"></i>
+                    <span>Faculty Accounts</span>
+                </a>
+                <a class="nav-item" onclick="switchAdminSection('labsSection')">
+                    <i class="fa-solid fa-building-columns nav-icon"></i>
+                    <span>Laboratories</span>
+                </a>
+                <a class="nav-item" onclick="switchAdminSection('equipmentSection')">
+                    <i class="fa-solid fa-microscope nav-icon"></i>
+                    <span>Equipment Catalogue</span>
+                </a>
+                <a class="nav-item" onclick="switchAdminSection('assignmentsSection')">
+                    <i class="fa-solid fa-link nav-icon"></i>
+                    <span>Faculty-Lab Links</span>
+                </a>
+                <a class="nav-item" onclick="switchAdminSection('bookingsSection')">
+                    <i class="fa-solid fa-calendar-days nav-icon"></i>
+                    <span>All Bookings</span>
+                </a>
+                <a class="nav-item" onclick="switchAdminSection('waitlistSection')">
+                    <i class="fa-solid fa-hourglass-half nav-icon"></i>
+                    <span>Waiting Lists</span>
+                </a>
+                <a class="nav-item" onclick="switchAdminSection('damageSection')">
+                    <i class="fa-solid fa-screwdriver-wrench nav-icon"></i>
+                    <span>Damage Reports</span>
+                </a>
+                <a class="nav-item" onclick="switchAdminSection('rulesSection')">
+                    <i class="fa-solid fa-sliders nav-icon"></i>
+                    <span>Fair Usage Rules</span>
+                </a>
+                <a class="nav-item" onclick="switchAdminSection('logsSection')">
+                    <i class="fa-solid fa-shield-virus nav-icon"></i>
+                    <span>Activity Audit Logs</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-summary">
+                    <div class="user-avatar-circle" style="background:#0284c7;">AD</div>
+                    <div class="user-profile-details">
+                        <div class="user-name" id="adminUserName">Administrator</div>
+                        <div class="user-role-label">System Admin</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="app-main">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="page-title-heading" id="pageTitle">System Overview & Analytics</h1>
+                </div>
+
+                <div class="navbar-right">
+                    <button class="btn-logout" onclick="Api.logout()">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="page-content">
+
+                <!-- 1. DASHBOARD METRICS -->
+                <section id="dashboardSection">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="fa-solid fa-user-graduate"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statTotalStudents">0</h3>
+                                <p>Enrolled Students</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon amber">
+                                <i class="fa-solid fa-chalkboard-user"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statTotalFaculty">0</h3>
+                                <p>Faculty In-Charges</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon purple">
+                                <i class="fa-solid fa-building-columns"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statTotalLabs">0</h3>
+                                <p>Active Laboratories</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="fa-solid fa-microscope"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statTotalEquipment">0</h3>
+                                <p>Registered Assets</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statTotalBookings">0</h3>
+                                <p>Total Reservations</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon amber">
+                                <i class="fa-solid fa-clipboard-question"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statPendingBookings">0</h3>
+                                <p>Pending Review</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon red">
+                                <i class="fa-solid fa-screwdriver-wrench"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statDamageReports">0</h3>
+                                <p>Open Damage Incidents</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon red">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statOverdueBookings">0</h3>
+                                <p>Overdue Reservations</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent System Activity -->
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Recent System Activity & Logs</h2>
+                            <button class="btn btn-secondary btn-sm" onclick="switchAdminSection('logsSection')">View Audit Trail</button>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Timestamp</th>
+                                            <th>Action</th>
+                                            <th>Entity</th>
+                                            <th>Description</th>
+                                            <th>IP Address</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="quickAuditTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. STUDENT MANAGEMENT -->
+                <section id="studentsSection" style="display:none;">
+                    <div class="toolbar-bar">
+                        <div class="search-input-box">
+                            <i class="fa-solid fa-magnifying-glass search-icon-abs"></i>
+                            <input type="text" id="studentSearchInput" placeholder="Search by name, roll no, department..." oninput="handleStudentSearch()">
+                        </div>
+                        <div class="table-actions">
+                            <button class="btn btn-primary" onclick="openStudentModal()">
+                                <i class="fa-solid fa-user-plus"></i> Add Student
+                            </button>
+                            <button class="btn btn-secondary" onclick="openCsvImportModal()">
+                                <i class="fa-solid fa-file-csv"></i> CSV Batch Import
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Student Registry</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Reg No</th>
+                                            <th>Full Name</th>
+                                            <th>Department</th>
+                                            <th>Semester</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentsTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. FACULTY MANAGEMENT -->
+                <section id="facultySection" style="display:none;">
+                    <div class="toolbar-bar">
+                        <div class="search-input-box">
+                            <i class="fa-solid fa-magnifying-glass search-icon-abs"></i>
+                            <input type="text" id="facultySearchInput" placeholder="Search faculty..." oninput="handleFacultySearch()">
+                        </div>
+                        <button class="btn btn-primary" onclick="openFacultyModal()">
+                            <i class="fa-solid fa-user-plus"></i> Add Faculty
+                        </button>
+                    </div>
+
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Faculty Staff Registry</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Faculty Code</th>
+                                            <th>Full Name</th>
+                                            <th>Department</th>
+                                            <th>Designation</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="facultyTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. LABORATORY MANAGEMENT -->
+                <section id="labsSection" style="display:none;">
+                    <div class="toolbar-bar">
+                        <button class="btn btn-primary" onclick="openLabModal()">
+                            <i class="fa-solid fa-plus"></i> Add Laboratory
+                        </button>
+                    </div>
+
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Laboratory Facilities</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Laboratory Name</th>
+                                            <th>Location</th>
+                                            <th>Capacity</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminLabsTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. EQUIPMENT MANAGEMENT -->
+                <section id="equipmentSection" style="display:none;">
+                    <div class="toolbar-bar">
+                        <div class="search-input-box">
+                            <i class="fa-solid fa-magnifying-glass search-icon-abs"></i>
+                            <input type="text" id="adminEquipSearchInput" placeholder="Search assets..." oninput="handleAdminEquipmentSearch()">
+                        </div>
+                        <button class="btn btn-primary" onclick="openEquipmentModal()">
+                            <i class="fa-solid fa-plus"></i> Register Equipment
+                        </button>
+                    </div>
+
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Institutional Equipment Registry</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Equipment Name</th>
+                                            <th>Laboratory</th>
+                                            <th>Category</th>
+                                            <th>Total</th>
+                                            <th>Available</th>
+                                            <th>Condition</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminEquipmentTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. FACULTY-LAB ASSIGNMENTS -->
+                <section id="assignmentsSection" style="display:none;">
+                    <div class="toolbar-bar">
+                        <button class="btn btn-primary" onclick="openAssignmentModal()">
+                            <i class="fa-solid fa-link"></i> New Faculty-Lab Assignment
+                        </button>
+                    </div>
+
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Faculty Laboratory In-Charge Assignments</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Faculty Member</th>
+                                            <th>Assigned Laboratory</th>
+                                            <th>Assignment Role</th>
+                                            <th>Assigned Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="assignmentsTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. ALL BOOKINGS -->
+                <section id="bookingsSection" style="display:none;">
+                    <div class="toolbar-bar">
+                        <select id="adminBookingStatusFilter" class="select-filter" onchange="loadAdminBookings()">
+                            <option value="">All Statuses</option>
+                            <option value="PENDING">Pending Review</option>
+                            <option value="APPROVED">Approved</option>
+                            <option value="COLLECTED">Collected</option>
+                            <option value="RETURNED">Returned</option>
+                            <option value="CANCELLED">Cancelled</option>
+                            <option value="OVERDUE">Overdue</option>
+                        </select>
+                    </div>
+
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Master Booking Registry</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Student</th>
+                                            <th>Equipment</th>
+                                            <th>Date</th>
+                                            <th>Slot</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminBookingsTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. WAITING LISTS -->
+                <section id="waitlistSection" style="display:none;">
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>All Equipment Waiting Lists</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Waitlist ID</th>
+                                            <th>Equipment</th>
+                                            <th>Student</th>
+                                            <th>Date</th>
+                                            <th>Slot</th>
+                                            <th>Position</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminWaitlistTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 9. DAMAGE REPORTS -->
+                <section id="damageSection" style="display:none;">
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Equipment Damage Incidents</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Equipment</th>
+                                            <th>Reported By</th>
+                                            <th>Severity</th>
+                                            <th>Description</th>
+                                            <th>Status</th>
+                                            <th>Update Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminDamageTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 10. FAIR USAGE RULES -->
+                <section id="rulesSection" style="display:none;">
+                    <div class="content-panel" style="max-width:700px;">
+                        <div class="panel-header">
+                            <h2>Configure Fair Usage Policies (Per Lab)</h2>
+                        </div>
+                        <div class="panel-body">
+                            <form onsubmit="saveUsageRule(event)">
+                                <div class="form-group">
+                                    <label for="ruleLabSelect">Target Laboratory *</label>
+                                    <select id="ruleLabSelect" class="form-control" onchange="fetchUsageRuleForLab()" required></select>
+                                </div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                                    <div class="form-group">
+                                        <label for="ruleMaxDuration">Max Duration (Hours) *</label>
+                                        <input type="number" id="ruleMaxDuration" class="form-control" value="4" min="1" max="24" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="ruleMaxAdvance">Max Advance Booking (Days) *</label>
+                                        <input type="number" id="ruleMaxAdvance" class="form-control" value="7" min="1" max="90" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ruleMaxConcurrent">Max Concurrent Reservations per Student *</label>
+                                    <input type="number" id="ruleMaxConcurrent" class="form-control" value="1" min="1" max="5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ruleAllowedDays">Permitted Days (comma-separated) *</label>
+                                    <input type="text" id="ruleAllowedDays" class="form-control" value="MON,TUE,WED,THU,FRI" required>
+                                </div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                                    <div class="form-group">
+                                        <label for="ruleOpenTime">Daily Open Time *</label>
+                                        <input type="time" id="ruleOpenTime" class="form-control" value="08:00" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="ruleCloseTime">Daily Close Time *</label>
+                                        <input type="time" id="ruleCloseTime" class="form-control" value="18:00" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Save Usage Rule</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 11. AUDIT LOGS -->
+                <section id="logsSection" style="display:none;">
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Security & Activity Audit Logs</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Log ID</th>
+                                            <th>Timestamp</th>
+                                            <th>User</th>
+                                            <th>Action Type</th>
+                                            <th>Entity</th>
+                                            <th>Description</th>
+                                            <th>IP</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="fullAuditTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Student Modal (Add/Edit) -->
+    <div id="studentModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="studentModalTitle">Add New Student</h3>
+                <button class="modal-close-btn" onclick="closeStudentModal()">&times;</button>
+            </div>
+            <form onsubmit="submitStudentForm(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="studentEditId">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label>Username *</label>
+                            <input type="text" id="studentUsername" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="studentEmail" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group" id="studentPasswordGroup">
+                        <label>Password *</label>
+                        <input type="password" id="studentPassword" class="form-control" minlength="8" placeholder="Minimum 8 characters">
+                    </div>
+                    <div class="form-group">
+                        <label>Registration / Roll Number *</label>
+                        <input type="text" id="studentRegNo" class="form-control" required>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label>First Name *</label>
+                            <input type="text" id="studentFirstName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name *</label>
+                            <input type="text" id="studentLastName" class="form-control" required>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:2fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label>Department *</label>
+                            <input type="text" id="studentDept" class="form-control" placeholder="e.g. Computer Science" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Semester *</label>
+                            <input type="number" id="studentSem" class="form-control" min="1" max="12" value="1" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CSV Import Modal -->
+    <div id="csvImportModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Batch Student CSV Import</h3>
+                <button class="modal-close-btn" onclick="closeCsvImportModal()">&times;</button>
+            </div>
+            <form onsubmit="submitCsvImport(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Select CSV File *</label>
+                        <input type="file" id="csvFile" class="form-control" accept=".csv" required>
+                    </div>
+                    <div style="font-size:0.8rem; background:#f8fafc; padding:0.75rem; border-radius:6px; color:#475569;">
+                        <strong>CSV Format Header:</strong><br>
+                        <code>username,email,password,reg_number,first_name,last_name,department,semester,phone</code>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeCsvImportModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload & Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Faculty Modal -->
+    <div id="facultyModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Add New Faculty</h3>
+                <button class="modal-close-btn" onclick="closeFacultyModal()">&times;</button>
+            </div>
+            <form onsubmit="submitFacultyForm(event)">
+                <div class="modal-body">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label>Username *</label>
+                            <input type="text" id="facUsername" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email *</label>
+                            <input type="email" id="facEmail" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <input type="password" id="facPassword" class="form-control" minlength="8" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Faculty Code / Employee ID *</label>
+                        <input type="text" id="facCode" class="form-control" placeholder="e.g. FAC-CS-003" required>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label>First Name *</label>
+                            <input type="text" id="facFirstName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name *</label>
+                            <input type="text" id="facLastName" class="form-control" required>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label>Department *</label>
+                            <input type="text" id="facDept" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Designation *</label>
+                            <input type="text" id="facDesignation" class="form-control" placeholder="e.g. Assistant Professor" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeFacultyModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Faculty</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Laboratory Modal -->
+    <div id="labModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="labModalTitle">Add Laboratory</h3>
+                <button class="modal-close-btn" onclick="closeLabModal()">&times;</button>
+            </div>
+            <form onsubmit="submitLabForm(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="labEditId">
+                    <div class="form-group">
+                        <label>Lab Code *</label>
+                        <input type="text" id="labCodeInput" class="form-control" placeholder="e.g. CS-LAB-03" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Laboratory Name *</label>
+                        <input type="text" id="labNameInput" class="form-control" placeholder="e.g. Artificial Intelligence Lab" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Location / Room *</label>
+                        <input type="text" id="labLocationInput" class="form-control" placeholder="e.g. Block C, Floor 3, Room 301" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Capacity *</label>
+                        <input type="number" id="labCapacityInput" class="form-control" min="1" value="30" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeLabModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Laboratory</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Equipment Modal -->
+    <div id="equipmentModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 650px;">
+            <div class="modal-header">
+                <h3 id="equipmentModalTitle">Register Equipment</h3>
+                <button class="modal-close-btn" onclick="closeEquipmentModal()">&times;</button>
+            </div>
+            <form onsubmit="submitEquipmentForm(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="equipEditId">
+                    <div class="form-group">
+                        <label>Laboratory Location *</label>
+                        <select id="equipLabSelect" class="form-control" required></select>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label>Asset Code / Tag *</label>
+                            <input type="text" id="equipCode" class="form-control" placeholder="e.g. EQ-AI-001" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Equipment Name *</label>
+                            <input type="text" id="equipName" class="form-control" placeholder="e.g. NVIDIA GPU Workstation" required>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <input type="text" id="equipCategory" class="form-control" placeholder="e.g. Computing / Robotics" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Make & Model</label>
+                            <input type="text" id="equipModel" class="form-control" placeholder="e.g. Dell Precision 7920">
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label>Total Inventory *</label>
+                            <input type="number" id="equipTotalQty" class="form-control" min="1" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Available for Reservation *</label>
+                            <input type="number" id="equipAvailQty" class="form-control" min="0" value="1" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Condition Status *</label>
+                        <select id="equipCondition" class="form-control">
+                            <option value="GOOD">GOOD</option>
+                            <option value="FAIR">FAIR</option>
+                            <option value="POOR">POOR</option>
+                            <option value="UNDER_REPAIR">UNDER REPAIR</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Technical Description</label>
+                        <textarea id="equipDesc" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEquipmentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Equipment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Faculty-Lab Assignment Modal -->
+    <div id="assignmentModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Assign Faculty to Laboratory</h3>
+                <button class="modal-close-btn" onclick="closeAssignmentModal()">&times;</button>
+            </div>
+            <form onsubmit="submitAssignmentForm(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Faculty Member *</label>
+                        <select id="assignFacultySelect" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Laboratory Facility *</label>
+                        <select id="assignLabSelect" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Designation Role *</label>
+                        <select id="assignRoleSelect" class="form-control" required>
+                            <option value="INCHARGE">INCHARGE (Principal Lab Head)</option>
+                            <option value="ASSISTANT">ASSISTANT (Faculty Assistant)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Assignment Effective Date *</label>
+                        <input type="date" id="assignDate" class="form-control" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeAssignmentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Assign</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

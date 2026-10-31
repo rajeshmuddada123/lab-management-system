@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Portal — College Resource Sharing</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="app-layout">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo" style="background:var(--accent-color);">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <div>
+                    <h2>College Resources</h2>
+                    <span>Faculty Portal</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Faculty Oversight</div>
+                <a class="nav-item active" onclick="switchFacultySection('dashboardSection')">
+                    <i class="fa-solid fa-gauge nav-icon"></i>
+                    <span>Overview</span>
+                </a>
+                <a class="nav-item" onclick="switchFacultySection('assignedLabsSection')">
+                    <i class="fa-solid fa-door-open nav-icon"></i>
+                    <span>Assigned Labs</span>
+                </a>
+                <a class="nav-item" onclick="switchFacultySection('equipmentSection')">
+                    <i class="fa-solid fa-microscope nav-icon"></i>
+                    <span>Lab Equipment</span>
+                </a>
+                <a class="nav-item" onclick="switchFacultySection('approvalsSection')">
+                    <i class="fa-solid fa-signature nav-icon"></i>
+                    <span>Booking Requests</span>
+                    <span id="pendingApprovalsBadge" class="nav-badge" style="display:none;">0</span>
+                </a>
+                <a class="nav-item" onclick="switchFacultySection('handoverSection')">
+                    <i class="fa-solid fa-handshake-angle nav-icon"></i>
+                    <span>Collection & Returns</span>
+                </a>
+                <a class="nav-item" onclick="switchFacultySection('damageSection')">
+                    <i class="fa-solid fa-screwdriver-wrench nav-icon"></i>
+                    <span>Damage Reports</span>
+                </a>
+                <a class="nav-item" onclick="switchFacultySection('overdueSection')">
+                    <i class="fa-solid fa-triangle-exclamation nav-icon"></i>
+                    <span>Overdue Tracking</span>
+                    <span id="overdueBadge" class="nav-badge" style="background:#dc2626; display:none;">0</span>
+                </a>
+                <a class="nav-item" onclick="switchFacultySection('historySection')">
+                    <i class="fa-solid fa-clock-rotate-left nav-icon"></i>
+                    <span>All Lab Bookings</span>
+                </a>
+                <a class="nav-item" onclick="switchFacultySection('profileSection')">
+                    <i class="fa-solid fa-id-badge nav-icon"></i>
+                    <span>Faculty Profile</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-summary">
+                    <div class="user-avatar-circle" style="background:var(--accent-color);" id="sidebarAvatar">FC</div>
+                    <div class="user-profile-details">
+                        <div class="user-name" id="sidebarUserName">Faculty Member</div>
+                        <div class="user-role-label" id="sidebarUserCode">FAC-001</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="app-main">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="navbar-left">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="page-title-heading" id="pageTitle">Faculty Laboratory Oversight</h1>
+                </div>
+
+                <div class="navbar-right">
+                    <button class="btn-logout" onclick="Api.logout()">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="page-content">
+
+                <!-- 1. DASHBOARD OVERVIEW -->
+                <section id="dashboardSection">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon amber">
+                                <i class="fa-solid fa-clipboard-question"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statPendingApprovals">0</h3>
+                                <p>Pending Approvals</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="fa-solid fa-microscope"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statTotalLabEquipment">0</h3>
+                                <p>Managed Instruments</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="fa-solid fa-box-archive"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statActiveHandovers">0</h3>
+                                <p>Currently In-Use</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon red">
+                                <i class="fa-solid fa-clock"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3 id="statOverdueCount">0</h3>
+                                <p>Overdue Items</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Approval Quick Actions -->
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Action Required: Pending Approvals</h2>
+                            <button class="btn btn-secondary btn-sm" onclick="switchFacultySection('approvalsSection')">View All Requests</button>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Student</th>
+                                            <th>Equipment</th>
+                                            <th>Usage Date</th>
+                                            <th>Slot</th>
+                                            <th>Purpose</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="quickPendingApprovalsBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. ASSIGNED LABS -->
+                <section id="assignedLabsSection" style="display:none;">
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>My Assigned Laboratories</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="equipment-grid" id="assignedLabsContainer">
+                                <!-- Loaded dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. LAB EQUIPMENT MANAGEMENT -->
+                <section id="equipmentSection" style="display:none;">
+                    <div class="toolbar-bar">
+                        <div class="filters-group">
+                            <label style="font-weight:600; font-size:0.9rem;">Select Lab:</label>
+                            <select id="facultyLabSelect" class="select-filter" onchange="loadFacultyEquipment()">
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="openConditionReportModal()">
+                            <i class="fa-solid fa-file-waveform"></i> Submit Condition Check
+                        </button>
+                    </div>
+
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Laboratory Inventory & Availability Controls</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Code</th>
+                                            <th>Equipment Name</th>
+                                            <th>Category</th>
+                                            <th>Total Stock</th>
+                                            <th>Available Qty</th>
+                                            <th>Condition</th>
+                                            <th>Update Controls</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="facultyEquipmentTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. BOOKING APPROVALS -->
+                <section id="approvalsSection" style="display:none;">
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Manage Booking Reservations</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Booking ID</th>
+                                            <th>Student Name & Reg No</th>
+                                            <th>Equipment</th>
+                                            <th>Date</th>
+                                            <th>Time Slot</th>
+                                            <th>Qty</th>
+                                            <th>Academic Purpose</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="fullApprovalsTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 5. COLLECTION & RETURN VERIFICATION -->
+                <section id="handoverSection" style="display:none;">
+                    <div class="tab-nav">
+                        <button class="tab-btn active" onclick="switchHandoverTab('collectionTab', this)">Equipment Collection Pickup</button>
+                        <button class="tab-btn" onclick="switchHandoverTab('returnTab', this)">Equipment Return & Inspection</button>
+                    </div>
+
+                    <!-- Collection Tab -->
+                    <div id="collectionTab" class="content-panel">
+                        <div class="panel-header">
+                            <h2>Approved Reservations Awaiting Pickup</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Student</th>
+                                            <th>Equipment</th>
+                                            <th>Scheduled Slot</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="collectionTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Return Tab -->
+                    <div id="returnTab" class="content-panel" style="display:none;">
+                        <div class="panel-header">
+                            <h2>Currently Issued Equipment Awaiting Return</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Student</th>
+                                            <th>Equipment</th>
+                                            <th>Issued Date</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="returnTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. DAMAGE REPORTS -->
+                <section id="damageSection" style="display:none;">
+                    <div class="toolbar-bar">
+                        <button class="btn btn-accent" onclick="openDamageModal()">
+                            <i class="fa-solid fa-triangle-exclamation"></i> File New Damage Incident
+                        </button>
+                    </div>
+
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Damage Incidents & Repair Tracking</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Equipment</th>
+                                            <th>Severity</th>
+                                            <th>Description</th>
+                                            <th>Reported Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="facultyDamageTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. OVERDUE TRACKING -->
+                <section id="overdueSection" style="display:none;">
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Overdue Equipment Monitor</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Booking ID</th>
+                                            <th>Student</th>
+                                            <th>Equipment</th>
+                                            <th>Reserved Date</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="overdueTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 8. HISTORY -->
+                <section id="historySection" style="display:none;">
+                    <div class="content-panel">
+                        <div class="panel-header">
+                            <h2>Historical Bookings for Assigned Laboratories</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="app-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Student</th>
+                                            <th>Equipment</th>
+                                            <th>Lab</th>
+                                            <th>Date</th>
+                                            <th>Slot</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="facultyHistoryTableBody">
+                                        <!-- Loaded dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 9. PROFILE -->
+                <section id="profileSection" style="display:none;">
+                    <div class="content-panel" style="max-width: 650px;">
+                        <div class="panel-header">
+                            <h2>Faculty Academic Profile</h2>
+                        </div>
+                        <div class="panel-body" id="facultyProfileContent">
+                            <!-- Loaded dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Rejection Reason Modal -->
+    <div id="rejectionModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Reject Booking Request</h3>
+                <button class="modal-close-btn" onclick="closeRejectionModal()">&times;</button>
+            </div>
+            <form onsubmit="submitRejection(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="rejectBookingId">
+                    <div class="form-group">
+                        <label for="rejectReason">Specific Academic / Operational Reason *</label>
+                        <textarea id="rejectReason" class="form-control" rows="3" placeholder="Provide clear feedback to the student (e.g. Lab closed for maintenance, schedule clash)..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeRejectionModal()">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Confirm Rejection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Collection Verification Modal -->
+    <div id="collectionVerifyModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Verify Equipment Collection</h3>
+                <button class="modal-close-btn" onclick="closeCollectionModal()">&times;</button>
+            </div>
+            <form onsubmit="submitCollectionVerification(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="collectionBookingId">
+                    <div class="form-group">
+                        <label>Initial Condition on Pickup *</label>
+                        <select id="collectionCondition" class="form-control" required>
+                            <option value="GOOD">GOOD — Functional & Clean</option>
+                            <option value="FAIR">FAIR — Minor cosmetic wear</option>
+                            <option value="POOR">POOR — Fragile or operational limits</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Photographic Record (Optional)</label>
+                        <input type="file" id="collectionPhoto" class="form-control" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Inspection Notes</label>
+                        <textarea id="collectionNotes" class="form-control" rows="2" placeholder="Note serial numbers verified or accessories provided..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeCollectionModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Confirm Handover</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Return Verification Modal -->
+    <div id="returnVerifyModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Verify Equipment Return</h3>
+                <button class="modal-close-btn" onclick="closeReturnModal()">&times;</button>
+            </div>
+            <form onsubmit="submitReturnVerification(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="returnBookingId">
+                    <div class="form-group">
+                        <label>Final Condition on Return *</label>
+                        <select id="returnCondition" class="form-control" required>
+                            <option value="GOOD">GOOD — Intact & functional</option>
+                            <option value="FAIR">FAIR — Wear noticed</option>
+                            <option value="POOR">POOR — Needs maintenance check</option>
+                            <option value="DAMAGED">DAMAGED — Physical or electrical flaw</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Return Photograph (Optional)</label>
+                        <input type="file" id="returnPhoto" class="form-control" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label>Return Inspection Notes</label>
+                        <textarea id="returnNotes" class="form-control" rows="2" placeholder="Record condition, cable returns, configuration resets..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeReturnModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success">Confirm Return</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Damage Incident Modal -->
+    <div id="damageReportModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Submit Damage Incident Report</h3>
+                <button class="modal-close-btn" onclick="closeDamageModal()">&times;</button>
+            </div>
+            <form onsubmit="submitDamageReport(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="damageEquipmentSelect">Equipment Asset *</label>
+                        <select id="damageEquipmentSelect" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="damageSeverity">Severity *</label>
+                        <select id="damageSeverity" class="form-control" required>
+                            <option value="MINOR">MINOR — Cosmetic or non-blocking</option>
+                            <option value="MODERATE">MODERATE — Partial failure / needs repair</option>
+                            <option value="SEVERE">SEVERE — Major component broken</option>
+                            <option value="TOTAL_LOSS">TOTAL LOSS — Decommission required</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="damageCost">Estimated Repair Cost (Optional)</label>
+                        <input type="number" step="0.01" id="damageCost" class="form-control" placeholder="e.g. 500.00">
+                    </div>
+                    <div class="form-group">
+                        <label for="damagePhoto">Damage Photograph (Optional)</label>
+                        <input type="file" id="damagePhoto" class="form-control" accept="image/*">
+                    </div>
+                    <div class="form-group">
+                        <label for="damageDesc">Detailed Description of Defect *</label>
+                        <textarea id="damageDesc" class="form-control" rows="3" placeholder="Describe how damage was discovered, visible cracks, errors..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeDamageModal()">Cancel</button>
+                    <button type="submit" class="btn btn-danger">File Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Condition Report Modal -->
+    <div id="conditionReportModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Periodic Condition Inspection</h3>
+                <button class="modal-close-btn" onclick="closeConditionReportModal()">&times;</button>
+            </div>
+            <form onsubmit="submitConditionCheck(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="conditionEquipSelect">Equipment Asset *</label>
+                        <select id="conditionEquipSelect" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="conditionCheckStatus">Evaluated Status *</label>
+                        <select id="conditionCheckStatus" class="form-control" required>
+                            <option value="GOOD">GOOD</option>
+                            <option value="FAIR">FAIR</option>
+                            <option value="POOR">POOR</option>
+                            <option value="NEEDS_REPAIR">NEEDS REPAIR</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="conditionDesc">Inspection Findings *</label>
+                        <textarea id="conditionDesc" class="form-control" rows="3" placeholder="Describe routine inspection, calibration checks, power tests..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeConditionReportModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Inspection</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/faculty.js"></script>
+</body>
+</html>
